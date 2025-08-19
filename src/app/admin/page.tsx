@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Table from "@/components/tables/Table";
 import { MockItemRequest } from "@/lib/types/mock/request";
 import { RequestStatus } from "@/lib/types/request";
@@ -23,7 +23,8 @@ export default function ItemRequestsPage() {
     pageSize: 6
   });
 
-  const fetchRequests = async (page: number = 1, status?: string) => {
+  // Memoize fetchRequests to prevent unnecessary re-renders
+  const fetchRequests = useCallback(async (page: number = 1, status?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -46,13 +47,14 @@ export default function ItemRequestsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRequests(1, selectedStatus);
-  }, [selectedStatus]);
+  }, [selectedStatus, fetchRequests]);
 
-  const handleStatusChange = async (id: number, newStatus: RequestStatus) => {
+  // Memoize handleStatusChange to prevent unnecessary re-renders
+  const handleStatusChange = useCallback(async (id: number, newStatus: RequestStatus) => {
     try {
       const response = await fetch('/api/request', {
         method: 'PATCH',
@@ -69,16 +71,28 @@ export default function ItemRequestsPage() {
     } catch (error) {
       console.error('Error updating status:', error);
     }
-  };
+  }, [fetchRequests, pagination.currentPage, selectedStatus]);
 
-  const handlePageChange = (newPage: number) => {
+  // Memoize handlePageChange to prevent unnecessary re-renders
+  const handlePageChange = useCallback((newPage: number) => {
     fetchRequests(newPage, selectedStatus);
-  };
+  }, [fetchRequests, selectedStatus]);
 
-  const handleStatusTabChange = (status: string) => {
+  // Memoize handleStatusTabChange to prevent unnecessary re-renders
+  const handleStatusTabChange = useCallback((status: string) => {
     setSelectedStatus(status);
     setPagination(prev => ({ ...prev, currentPage: 1 }));
-  };
+  }, []);
+
+  // Memoize the table component props to prevent unnecessary re-renders
+  const tableProps = useMemo(() => ({
+    data: itemRequests,
+    onStatusChange: handleStatusChange,
+    pagination: pagination,
+    onPageChange: handlePageChange,
+    selectedStatus: selectedStatus,
+    onStatusTabChange: handleStatusTabChange
+  }), [itemRequests, handleStatusChange, pagination, handlePageChange, selectedStatus, handleStatusTabChange]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -98,14 +112,7 @@ export default function ItemRequestsPage() {
                 <div className="text-gray-500">Loading...</div>
               </div>
             ) : (
-              <Table 
-                data={itemRequests} 
-                onStatusChange={handleStatusChange}
-                pagination={pagination}
-                onPageChange={handlePageChange}
-                selectedStatus={selectedStatus}
-                onStatusTabChange={handleStatusTabChange}
-              />
+              <Table {...tableProps} />
             )}
           </div>
         </div>

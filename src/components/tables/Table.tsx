@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { MockItemRequest } from "@/lib/types/mock/request";
 import Dropdown from "@/components/atoms/Dropdown";
 import { RequestStatus } from "@/lib/types/request";
 import Pagination from "@/components/molecules/Pagination";
+
+// Move statusTabs outside component to prevent recreation
+const STATUS_TABS = [
+  { key: "all", label: "All" },
+  { key: "pending", label: "Pending" },
+  { key: "approved", label: "Approved" },
+  { key: "completed", label: "Completed" },
+  { key: "rejected", label: "Rejected" }
+] as const;
 
 interface TableProps {
   data: MockItemRequest[];
@@ -19,6 +28,27 @@ interface TableProps {
   onStatusTabChange?: (status: string) => void;
 }
 
+// Move formatDate outside component to prevent recreation
+const formatDate = (date: Date | string | null) => {
+  if (!date) return "N/A";
+  
+  // If it's already a string, return it as is
+  if (typeof date === 'string') {
+    return date;
+  }
+  
+  // If it's a Date object, format it
+  if (date instanceof Date) {
+    return date.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "2-digit",
+    });
+  }
+  
+  return "N/A";
+};
+
 export default function Table({ 
   data, 
   onStatusChange, 
@@ -28,59 +58,119 @@ export default function Table({
   selectedStatus = "all",
   onStatusTabChange
 }: TableProps) {
-  const formatDate = (date: Date | string | null) => {
-    if (!date) return "N/A";
-    
-    // If it's already a string, return it as is
-    if (typeof date === 'string') {
-      return date;
-    }
-    
-    // If it's a Date object, format it
-    if (date instanceof Date) {
-      return date.toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "2-digit",
-      });
-    }
-    
-    return "N/A";
-  };
-
-  const handleStatusChange = (id: number, newStatus: RequestStatus) => {
+  // Memoize handleStatusChange to prevent unnecessary re-renders
+  const handleStatusChange = useCallback((id: number, newStatus: RequestStatus) => {
     if (onStatusChange) {
       onStatusChange(id, newStatus);
     }
-  };
+  }, [onStatusChange]);
 
-  const statusTabs = [
-    { key: "all", label: "All" },
-    { key: "pending", label: "Pending" },
-    { key: "approved", label: "Approved" },
-    { key: "completed", label: "Completed" },
-    { key: "rejected", label: "Rejected" }
-  ];
+  // Memoize status tabs rendering to prevent unnecessary re-renders
+  const statusTabsElements = useMemo(() => (
+    STATUS_TABS.map((tab) => (
+      <button
+        key={tab.key}
+        onClick={() => onStatusTabChange?.(tab.key)}
+        className={`
+          px-4 py-2 rounded-t-md font-medium transition-colors border border-b-0
+          ${selectedStatus === tab.key
+            ? 'bg-primary text-white border-primary'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200'
+          }
+        `}
+      >
+        {tab.label}
+      </button>
+    ))
+  ), [selectedStatus, onStatusTabChange]);
+
+  // Memoize table rows to prevent unnecessary re-renders
+  const tableRows = useMemo(() => (
+    data.map((item) => (
+      <tr
+        key={item.id}
+        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+      >
+        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+          {item.requestorName}
+        </td>
+        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+          {item.itemRequested}
+        </td>
+        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+          {formatDate(item.requestCreatedDate)}
+        </td>
+        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+          {formatDate(item.lastEditedDate)}
+        </td>
+        <td className="py-2 px-4">
+          <Dropdown
+            value={item.status}
+            onChange={(newStatus) => handleStatusChange(item.id, newStatus)}
+            className="w-32"
+          />
+        </td>
+      </tr>
+    ))
+  ), [data, handleStatusChange]);
+
+  // Memoize mobile cards to prevent unnecessary re-renders
+  const mobileCards = useMemo(() => (
+    data.map((item) => (
+      <div
+        key={item.id}
+        className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm"
+      >
+        <div className="space-y-2">
+          {/* Name and Status Row */}
+          <div className="flex items-center justify-between">
+            <h3 className="font-normal text-gray-field text-lg leading-5">
+              {item.requestorName}
+            </h3>
+            <Dropdown
+              value={item.status}
+              onChange={(newStatus) => handleStatusChange(item.id, newStatus)}
+              className=""
+            />
+          </div>
+
+          {/* Item Requested */}
+          <div>
+            <span className="text-sm font-normal text-gray-field leading-5">
+              Item Requested:
+            </span>
+            <p className="text-gray-field text-sm font-normal leading-5 mt-1">{item.itemRequested}</p>
+          </div>
+
+          {/* Dates Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="text-sm font-normal text-gray-field leading-5">
+                Created:
+              </span>
+              <p className="text-gray-field text-sm font-normal leading-5 mt-1">
+                {formatDate(item.requestCreatedDate)}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm font-normal text-gray-field leading-5">
+                Updated:
+              </span>
+              <p className="text-gray-field text-sm font-normal leading-5 mt-1">
+                {formatDate(item.lastEditedDate)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))
+  ), [data, handleStatusChange]);
 
   return (
     <div className={`w-full ${className}`}>
       {/* Status Filter Tabs */}
       <div className="flex space-x-2 ml-4 mt-2">
-        {statusTabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => onStatusTabChange?.(tab.key)}
-            className={`
-              px-4 py-2 rounded-t-md font-medium transition-colors border border-b-0
-              ${selectedStatus === tab.key
-                ? 'bg-primary text-white border-primary'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200'
-              }
-            `}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {statusTabsElements}
       </div>
 
       {/* Desktop Table */}
@@ -107,32 +197,7 @@ export default function Table({
               </tr>
             </thead>
             <tbody>
-              {data.map((item) => (
-                <tr
-                  key={item.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                >
-                  <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
-                    {item.requestorName}
-                  </td>
-                  <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
-                    {item.itemRequested}
-                  </td>
-                  <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
-                    {formatDate(item.requestCreatedDate)}
-                  </td>
-                  <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
-                    {formatDate(item.lastEditedDate)}
-                  </td>
-                  <td className="py-2 px-4">
-                    <Dropdown
-                      value={item.status}
-                      onChange={(newStatus) => handleStatusChange(item.id, newStatus)}
-                      className="w-32"
-                    />
-                  </td>
-                </tr>
-              ))}
+              {tableRows}
             </tbody>
           </table>
         </div>
@@ -140,54 +205,7 @@ export default function Table({
 
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
-        {data.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm"
-          >
-            <div className="space-y-2">
-              {/* Name and Status Row */}
-              <div className="flex items-center justify-between">
-                <h3 className="font-normal text-gray-field text-lg leading-5">
-                  {item.requestorName}
-                </h3>
-                <Dropdown
-                  value={item.status}
-                  onChange={(newStatus) => handleStatusChange(item.id, newStatus)}
-                  className=""
-                />
-              </div>
-
-              {/* Item Requested */}
-              <div>
-                <span className="text-sm font-normal text-gray-field leading-5">
-                  Item Requested:
-                </span>
-                <p className="text-gray-field text-sm font-normal leading-5 mt-1">{item.itemRequested}</p>
-              </div>
-
-              {/* Dates Row */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-sm font-normal text-gray-field leading-5">
-                    Created:
-                  </span>
-                  <p className="text-gray-field text-sm font-normal leading-5 mt-1">
-                    {formatDate(item.requestCreatedDate)}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-sm font-normal text-gray-field leading-5">
-                    Updated:
-                  </span>
-                  <p className="text-gray-field text-sm font-normal leading-5 mt-1">
-                    {formatDate(item.lastEditedDate)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+        {mobileCards}
       </div>
 
       {/* Pagination Controls */}

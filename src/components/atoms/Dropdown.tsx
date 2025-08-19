@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { RequestStatus } from "@/lib/types/request";
 
 interface DropdownProps {
@@ -16,37 +16,6 @@ interface StatusOption {
   badgeColor: string;
 }
 
-const statusOptions: StatusOption[] = [
-  {
-    value: RequestStatus.PENDING,
-    label: "Pending",
-    dotColor: "bg-status-pending-dot",
-    textColor: "text-status-pending-text",
-    badgeColor: "bg-status-pending-badge"
-  },
-  {
-    value: RequestStatus.APPROVED,
-    label: "Approved",
-    dotColor: "bg-status-approved-dot",
-    textColor: "text-status-approved-text",
-    badgeColor: "bg-status-approved-badge"
-  },
-  {
-    value: RequestStatus.COMPLETED,
-    label: "Completed",
-    dotColor: "bg-status-completed-dot",
-    textColor: "text-status-completed-text",
-    badgeColor: "bg-status-completed-badge"
-  },
-  {
-    value: RequestStatus.REJECTED,
-    label: "Rejected",
-    dotColor: "bg-status-rejected-dot",
-    textColor: "text-status-rejected-text",
-    badgeColor: "bg-status-rejected-badge"
-  }
-];
-
 export default function Dropdown({
   value,
   onChange,
@@ -56,29 +25,66 @@ export default function Dropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = statusOptions.find(option => option.value === value);
+  // Memoize statusOptions to prevent recreation on every render
+  const statusOptions = useMemo<StatusOption[]>(() => [
+    {
+      value: RequestStatus.PENDING,
+      label: "Pending",
+      dotColor: "bg-status-pending-dot",
+      textColor: "text-status-pending-text",
+      badgeColor: "bg-status-pending-badge"
+    },
+    {
+      value: RequestStatus.APPROVED,
+      label: "Approved",
+      dotColor: "bg-status-approved-dot",
+      textColor: "text-status-approved-text",
+      badgeColor: "bg-status-approved-badge"
+    },
+    {
+      value: RequestStatus.COMPLETED,
+      label: "Completed",
+      dotColor: "bg-status-completed-dot",
+      textColor: "text-status-completed-text",
+      badgeColor: "bg-status-completed-badge"
+    },
+    {
+      value: RequestStatus.REJECTED,
+      label: "Rejected",
+      dotColor: "bg-status-rejected-dot",
+      textColor: "text-status-rejected-text",
+      badgeColor: "bg-status-rejected-badge"
+    }
+  ], []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+  const selectedOption = useMemo(() => 
+    statusOptions.find(option => option.value === value), 
+    [statusOptions, value]
+  );
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+  // Memoize click outside handler
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
   }, []);
 
-  const handleToggle = () => {
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
+
+  // Memoize toggle and select handlers
+  const handleToggle = useCallback(() => {
     if (!disabled) {
       setIsOpen(!isOpen);
     }
-  };
+  }, [disabled, isOpen]);
 
-  const handleSelect = (status: RequestStatus) => {
+  const handleSelect = useCallback((status: RequestStatus) => {
     onChange(status);
     setIsOpen(false);
-  };
+  }, [onChange]);
 
   if (!selectedOption) return null;
 
