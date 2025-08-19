@@ -10,7 +10,7 @@ const ArrowButton = ({
   onClick?: () => void;
 }) => (
   <div
-    className="w-8 h-8 p-1 bg-gray-fill-light rounded border border-gray-stroke justify-center items-center inline-flex"
+    className="w-8 h-8 p-1 bg-gray-fill-light rounded border border-gray-stroke justify-center items-center inline-flex cursor-pointer hover:bg-gray-fill transition-colors"
     onClick={onClick}
   >
     {children}
