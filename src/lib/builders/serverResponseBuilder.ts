@@ -3,10 +3,10 @@ import { RESPONSES, ResponseType } from "@/lib/types/apiResponse";
 export class ServerResponseBuilder {
   private message: string;
   private status: number;
-  private data?: any;
-  private pagination?: any;
+  private data?: unknown;
+  private pagination?: Record<string, unknown>;
 
-  constructor(responseType: ResponseType, data?: any, pagination?: any) {
+  constructor(responseType: ResponseType, data?: unknown, pagination?: Record<string, unknown>) {
     const responseDetails = RESPONSES[responseType];
     this.message = responseDetails.message;
     this.status = responseDetails.code;
@@ -15,7 +15,7 @@ export class ServerResponseBuilder {
   }
 
   build(): Response {
-    const responseBody: any = { message: this.message };
+    const responseBody: Record<string, unknown> = { message: this.message };
 
     if (this.data) {
       responseBody.data = this.data;

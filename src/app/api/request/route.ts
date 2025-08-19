@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validateCreateRequest, CreateRequestData, validateUpdateRequest, UpdateRequestData } from '@/lib/validation/requestValidation'
-import { InvalidInputError } from '@/lib/errors/inputExceptions'
+import { InvalidInputError, InvalidPaginationError } from '@/lib/errors/inputExceptions'
 import { ResponseType } from '@/lib/types/apiResponse'
 import { ServerResponseBuilder } from '@/lib/builders/serverResponseBuilder'
 import { PAGINATION_PAGE_SIZE } from '@/lib/constants/config'
@@ -11,10 +11,16 @@ import { RequestStatus } from '@/lib/types/request'
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url)
-    const page = parseInt(url.searchParams.get('page') || '1')
+    const pageParam = url.searchParams.get('page') || '1'
+    const page = parseInt(pageParam)
     const status = url.searchParams.get('status')
     
-    const where: any = {}
+    // Validate page parameter 
+    if (pageParam !== page.toString()) {
+        throw new InvalidPaginationError(page, PAGINATION_PAGE_SIZE)
+    }
+    
+    const where: Record<string, unknown> = {}
     if (status) {
       // Validate status parameter
       if (!Object.values(RequestStatus).includes(status as RequestStatus)) {
@@ -47,7 +53,7 @@ export async function GET(request: NextRequest) {
     ).build()
     
   } catch (error) {
-    if (error instanceof InvalidInputError) {
+    if (error instanceof InvalidInputError || error instanceof InvalidPaginationError) {
       return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build()
     }
     
@@ -65,7 +71,7 @@ export async function PUT(request: NextRequest) {
     validateCreateRequest(body)
     
     // Create new request in database
-    const newRequest = await prisma.requests.create({
+    await prisma.requests.create({
       data: {
         requestorName: body.requestorName.trim(),
         itemRequested: body.itemRequested.trim()
@@ -95,7 +101,7 @@ export async function PATCH(request: NextRequest) {
     validateUpdateRequest(body)
     
     // Update request status and last edited date
-    const updatedRequest = await prisma.requests.update({
+    await prisma.requests.update({
       where: { id: body.id },
       data: {
         status: body.status,

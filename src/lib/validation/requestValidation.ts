@@ -1,6 +1,5 @@
 import { InvalidInputError } from '../errors/inputExceptions'
 import { RequestStatus } from '../types/request'
-import { NP } from '../constants/strings'
 
 // Reusable types for API endpoints
 export type CreateRequestData = {
@@ -11,6 +10,15 @@ export type CreateRequestData = {
 export type UpdateRequestData = {
   id: string
   status: RequestStatus
+}
+
+export type BatchUpdateData = {
+  requestorName: string
+  newStatus: RequestStatus
+}
+
+export type BatchDeleteData = {
+  requestorName: string
 }
 
 export function validateCreateRequest(data: CreateRequestData): void {
@@ -38,5 +46,21 @@ export function validateUpdateRequest(data: UpdateRequestData): void {
 
   if (!Object.values(RequestStatus).includes(data.status)) {
     throw new InvalidInputError('Invalid status. Must be one of: pending, completed, approved, rejected')
+  }
+}
+
+export function validateBatchUpdate(data: BatchUpdateData): void {
+  if (!data.requestorName || typeof data.requestorName !== 'string' || data.requestorName.trim().length === 0) {
+    throw new InvalidInputError('Requestor name is required and must be a non-empty string')
+  }
+  
+  if (!data.newStatus || !Object.values(RequestStatus).includes(data.newStatus)) {
+    throw new InvalidInputError('Valid new status is required. Must be one of: pending, completed, approved, rejected')
+  }
+}
+
+export function validateBatchDelete(data: BatchDeleteData): void {
+  if (!data.requestorName || typeof data.requestorName !== 'string' || data.requestorName.trim().length === 0) {
+    throw new InvalidInputError('Requestor name is required and must be a non-empty string')
   }
 }
