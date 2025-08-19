@@ -129,7 +129,7 @@ export default function Dropdown({
       {/* Dropdown Options */}
       {isOpen && (
         <div 
-          className="absolute top-full left-0 mt-1 bg-white rounded-md z-10"
+          className="fixed bg-white rounded-md z-[9999]"
           style={{
             width: '160px',
             padding: '4px 8px',
