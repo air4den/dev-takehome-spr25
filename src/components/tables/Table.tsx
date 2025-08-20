@@ -29,11 +29,20 @@ interface TableProps {
 }
 
 // Move formatDate outside component to prevent recreation
-const formatDate = (date: string | null) => {
+const formatDate = (date: Date | string | null) => {
   if (!date) return "N/A";
   
-  const dateObj = new Date(date);
-  if (isNaN(dateObj.getTime())) return "N/A";
+  let dateObj: Date;
+  
+  // Handle both Date objects and date strings
+  if (date instanceof Date) {
+    dateObj = date;
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) return "N/A";
+  } else {
+    return "N/A";
+  }
   
   const month = String(dateObj.getMonth() + 1).padStart(2, '0');
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -86,9 +95,9 @@ export default function Table({
       <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
         {item.itemRequested}
       </td>
-      <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
-        {formatDate(item.createdDate)}
-      </td>
+              <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
+          {formatDate(item.requestCreatedDate)}
+        </td>
       <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
         {formatDate(item.lastEditedDate)}
       </td>
@@ -135,9 +144,9 @@ export default function Table({
             <span className="text-sm font-normal text-gray-text-field leading-5">
               Created:
             </span>
-            <p className="text-gray-text-field text-sm font-normal leading-5 mt-1">
-              {formatDate(item.createdDate)}
-            </p>
+                          <p className="text-gray-text-field text-sm font-normal leading-5 mt-1">
+                {formatDate(item.requestCreatedDate)}
+              </p>
           </div>
           <div>
             <span className="text-sm font-normal text-gray-text-field leading-5">

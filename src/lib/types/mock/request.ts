@@ -4,7 +4,7 @@ export interface MockItemRequest {
   id: number;
   requestorName: string;
   itemRequested: string;
-  createdDate: Date;
+  requestCreatedDate: Date;
   lastEditedDate: Date | null;
   status: RequestStatus;
 }
