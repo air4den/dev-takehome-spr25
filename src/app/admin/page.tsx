@@ -99,7 +99,7 @@ export default function ItemRequestsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Table Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <h1 className="my-2 mx-4 text-2xl font-bold text-gray-text-field">
+          <h1 className="mt-4 mx-4 text-2xl font-bold text-gray-text-field">
             Item Requests
           </h1>
           <div className="p-2">
