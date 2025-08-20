@@ -91,16 +91,16 @@ export default function Table({
         key={item.id}
         className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
       >
-        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+        <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
           {item.requestorName}
         </td>
-        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+        <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
           {item.itemRequested}
         </td>
-        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+        <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
           {formatDate(item.requestCreatedDate)}
         </td>
-        <td className="py-2 px-4 text-gray-field text-lg font-light leading-5">
+        <td className="py-2 px-4 text-gray-text-field text-lg font-light leading-5">
           {formatDate(item.lastEditedDate)}
         </td>
         <td className="py-2 px-4">
@@ -124,7 +124,7 @@ export default function Table({
         <div className="space-y-2">
           {/* Name and Status Row */}
           <div className="flex items-center justify-between">
-            <h3 className="font-normal text-gray-field text-lg leading-5">
+            <h3 className="font-normal text-gray-text-field text-lg leading-5">
               {item.requestorName}
             </h3>
             <Dropdown
@@ -136,27 +136,27 @@ export default function Table({
 
           {/* Item Requested */}
           <div>
-            <span className="text-sm font-normal text-gray-field leading-5">
+            <span className="text-sm font-normal text-gray-text-field leading-5">
               Item Requested:
             </span>
-            <p className="text-gray-field text-sm font-normal leading-5 mt-1">{item.itemRequested}</p>
+            <p className="text-gray-text-field text-sm font-normal leading-5 mt-1">{item.itemRequested}</p>
           </div>
 
           {/* Dates Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="text-sm font-normal text-gray-field leading-5">
+              <span className="text-sm font-normal text-gray-text-field leading-5">
                 Created:
               </span>
-              <p className="text-gray-field text-sm font-normal leading-5 mt-1">
+              <p className="text-gray-text-field text-sm font-normal leading-5 mt-1">
                 {formatDate(item.requestCreatedDate)}
               </p>
             </div>
             <div>
-              <span className="text-sm font-normal text-gray-field leading-5">
+              <span className="text-sm font-normal text-gray-text-field leading-5">
                 Updated:
               </span>
-              <p className="text-gray-field text-sm font-normal leading-5 mt-1">
+              <p className="text-gray-text-field text-sm font-normal leading-5 mt-1">
                 {formatDate(item.lastEditedDate)}
               </p>
             </div>
@@ -179,19 +179,19 @@ export default function Table({
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-t border-b border-gray-100">
-                <th className="text-left py-4 px-4 font-light text-gray-field leading-5">
+                <th className="text-left py-4 px-4 font-light text-gray-text-field leading-5">
                   Name
                 </th>
-                <th className="text-left py-4 px-4 font-light text-gray-field leading-5">
+                <th className="text-left py-4 px-4 font-light text-gray-text-field leading-5">
                   Item Requested
                 </th>
-                <th className="text-left py-4 px-4 font-light text-gray-field leading-5">
+                <th className="text-left py-4 px-4 font-light text-gray-text-field leading-5">
                   Created
                 </th>
-                <th className="text-left py-4 px-4 font-light text-gray-field leading-5">
+                <th className="text-left py-4 px-4 font-light text-gray-text-field leading-5">
                   Updated
                 </th>
-                <th className="text-left py-4 px-4 font-light text-gray-field leading-5">
+                <th className="text-left py-4 px-4 font-light text-gray-text-field leading-5">
                   Status
                 </th>
               </tr>

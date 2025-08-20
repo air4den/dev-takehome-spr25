@@ -16,18 +16,18 @@
   - [✅] Above and Beyond
     - [✅] Batch edits
     - [✅] Batch deletes
-- [ ] Front-end
-  - [ ] Minimum Requirements
-    - [ ] Dropdown component
-    - [ ] Table component
-    - [ ] Base page [table with data]
-    - [ ] Table dropdown interactivity
-  - [ ] Main Requirements
-    - [ ] Pagination
-    - [ ] Tabs
-  - [ ] Above and Beyond
-    - [ ] Batch edits
-    - [ ] Batch deletes
+- [✅] Front-end
+  - [✅] Minimum Requirements
+    - [✅] Dropdown component
+    - [✅] Table component
+    - [✅] Base page [table with data]
+    - [✅] Table dropdown interactivity
+  - [✅] Main Requirements
+    - [✅] Pagination
+    - [✅] Tabs
+  - [] Above and Beyond
+    - [] Batch edits
+    - [] Batch deletes
 
 # Notes
 

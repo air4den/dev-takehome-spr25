@@ -95,21 +95,17 @@ export default function ItemRequestsPage() {
   }), [itemRequests, handleStatusChange, pagination, handlePageChange, selectedStatus, handleStatusTabChange]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-primary p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="my-2 mx-4">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Item Requests
-          </h1>
-        </div>
-
         {/* Table Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <h1 className="my-2 mx-4 text-2xl font-bold text-gray-text-field">
+            Item Requests
+          </h1>
           <div className="p-2">
             {loading ? (
               <div className="text-center py-4">
-                <div className="text-gray-500">Loading...</div>
+                <div className="text-gray-text-field">Loading...</div>
               </div>
             ) : (
               <Table {...tableProps} />
