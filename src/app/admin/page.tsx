@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import Table from "@/components/tables/Table";
 import { MockItemRequest } from "@/lib/types/mock/request";
 import { RequestStatus } from "@/lib/types/request";
+import Input from "@/components/atoms/Input";
+import Button from "@/components/atoms/Button";
 
 interface PaginationInfo {
   currentPage: number;
@@ -13,6 +15,8 @@ interface PaginationInfo {
 }
 
 export default function ItemRequestsPage() {
+  const [item, setItem] = useState<string>("");
+  const [requestorName, setRequestorName] = useState<string>("");
   const [itemRequests, setItemRequests] = useState<MockItemRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
@@ -94,10 +98,69 @@ export default function ItemRequestsPage() {
     onStatusTabChange: handleStatusTabChange
   }), [itemRequests, handleStatusChange, pagination, handlePageChange, selectedStatus, handleStatusTabChange]);
 
+  // Handle adding new item request
+  const handleAddItem = useCallback(async () => {
+    if (!requestorName.trim()) {
+      alert('Please enter a requestor name');
+      return;
+    }
+    
+    if (!item.trim()) {
+      alert('Please enter an item name');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/request', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requestorName: requestorName.trim(),
+          itemRequested: item.trim()
+        }),
+      });
+
+      if (response.ok) {
+        // Clear the inputs
+        setRequestorName('');
+        setItem('');
+        // Refresh the current data to show the new item
+        fetchRequests(pagination.currentPage, selectedStatus);
+        alert('Item request created successfully!');
+      } else {
+        const errorData = await response.json();
+        alert(`Error creating item request: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error creating item request:', error);
+      alert('Error creating item request. Please try again.');
+    }
+  }, [item, requestorName, fetchRequests, pagination.currentPage, selectedStatus]);
+
+  
   return (
     <div className="min-h-screen bg-primary p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Table Container */}
+      <h2 className="font-bold text-white text-center">Approve Items</h2>
+      <div className="flex flex-col w-80 gap-4 mx-auto">
+        <Input
+          type="text"
+          placeholder="Enter requestor name"
+          value={requestorName}
+          onChange={(e) => setRequestorName(e.target.value)}
+          label="Requestor Name"
+        />
+        <Input
+          type="text"
+          placeholder="Type an item"
+          value={item}
+          onChange={(e) => setItem(e.target.value)}
+          label="Item Requested"
+        />
+        <Button variant="inverted" onClick={handleAddItem}>Create Request</Button>
+      </div>
+      <div className="max-w-7xl mx-auto mt-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <h1 className="mt-4 mx-4 text-2xl font-bold text-gray-text-field">
             Item Requests
