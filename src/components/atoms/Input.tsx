@@ -31,7 +31,7 @@ export default function Input({
 
   return (
     <div>
-      {label && <label className="block">{label}</label>}
+      {label && <label className="block text-white">{label}</label>}
       <input
         type={type}
         placeholder={placeholder}

@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Requests {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  requestorName   String   @db.String
+  itemRequested   String   @db.String
+  createdDate     DateTime @default(now())
+  lastEditedDate  DateTime @default(now())
+  status          Status   @default(pending)
+
+  @@map("requests")
+}
+
+enum Status {
+  pending
+  completed
+  approved
+  rejected
+}

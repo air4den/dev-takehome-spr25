@@ -1,4 +1,4 @@
-import { ResponseType } from "@/lib/types/apiResponse";
+import { HTTP_STATUS_CODE, ResponseType } from "@/lib/types/apiResponse";
 import {
   createNewMockRequest,
   editMockStatusRequest,
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   try {
     const paginatedRequests = getMockItemRequests(status, page);
     return new Response(JSON.stringify(paginatedRequests), {
-      status: 200,
+      status: HTTP_STATUS_CODE.OK,
       headers: { "Content-Type": "application/json" },
     });
   } catch (e) {
@@ -30,7 +30,7 @@ export async function PUT(request: Request) {
     const req = await request.json();
     const newRequest = createNewMockRequest(req);
     return new Response(JSON.stringify(newRequest), {
-      status: 201,
+      status: HTTP_STATUS_CODE.CREATED,
       headers: { "Content-Type": "application/json" },
     });
   } catch (e) {
@@ -46,7 +46,7 @@ export async function PATCH(request: Request) {
     const req = await request.json();
     const editedRequest = editMockStatusRequest(req);
     return new Response(JSON.stringify(editedRequest), {
-      status: 200,
+      status: HTTP_STATUS_CODE.OK,
       headers: { "Content-Type": "application/json" },
     });
   } catch (e) {

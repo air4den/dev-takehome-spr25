@@ -22,6 +22,7 @@ export default {
           text: {
             DEFAULT: "#667084",
             dark: "#6a6a6a",
+            field: "#667085",
           },
         },
         success: {
@@ -43,6 +44,31 @@ export default {
           fill: "#ffdac3",
           indicator: "#fd8033",
           text: "#a43e00",
+        },
+        status: {
+          pending: {
+            dot: "#f59e0b",
+            text: "#92400e",
+            badge: "#fef3c7",
+          },
+          approved: {
+            dot: "#eab308",
+            text: "#a16207",
+            badge: "#fefce8",
+          },
+          completed: {
+            dot: "#22c55e",
+            text: "#166534",
+            badge: "#dcfce7",
+          },
+          rejected: {
+            dot: "#ef4444",
+            text: "#991b1b",
+            badge: "#fee2e2",
+          },
+          hover: {
+            button: "#EFF6FF",
+          }
         },
       },
       fontFamily: {
